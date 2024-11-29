@@ -1,26 +1,19 @@
-# FROM node:latest as build
-# WORKDIR /app
-# COPY package.json .
-# RUN npm install
-# COPY . .
-# RUN npm run build
-# FROM nginx
-# COPY --from=build /app/build /usr/share/nginx/html
-
 # set the base image to create the image for react app
-FROM node:20
+FROM node:20.9
 
 # set the working directory to /app
-WORKDIR /app
+RUN mkdir -p /usr/src/next-app && chown -R node:node /usr/src/next-app
 
 # copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # install dependencies
 RUN npm install
 
 # copy the rest of the files to the working directory
-COPY . .
+COPY --chown=node:node . .
+
+RUN npm run build
 
 # expose port 3000 to tell Docker that the container listens on the specified network ports at runtime
 EXPOSE 3000
